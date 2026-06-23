@@ -233,7 +233,6 @@ function createRegularPage(i) {
         main.children[i].insertAdjacentHTML('beforeend', append);
 
     }
-
 }
 
 function copyOrderID() {
