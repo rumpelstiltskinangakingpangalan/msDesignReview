@@ -4,8 +4,6 @@ document.addEventListener('click', (e) => {
 
     let target = e.target;
 
-    
-
     if(target.closest('#btnCopy') || target.id == 'btnCopy') {
 
         copyOrderID.call(target.closest('#btnCopy'));
