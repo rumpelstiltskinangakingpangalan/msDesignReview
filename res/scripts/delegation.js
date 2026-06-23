@@ -29,8 +29,6 @@ document.addEventListener('click', (e) => {
             document.querySelector('#dropdown').style.visibility = "hidden";
         }
     }
-
-    
     
     else {
         document.querySelector('#dropPages').dataset.show = "false";
