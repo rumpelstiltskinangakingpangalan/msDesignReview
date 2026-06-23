@@ -230,7 +230,6 @@ function createRegularPage(i) {
             </div>`
         }
 
-        
         main.children[i].insertAdjacentHTML('beforeend', append);
 
     }
