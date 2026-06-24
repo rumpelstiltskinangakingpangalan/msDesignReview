@@ -269,7 +269,6 @@ function resetOptPages () {
     document.querySelector('#dropdown').innerHTML = append;
 }
 
-
 function goToPage() {
 
     let main = document.querySelector('main');
