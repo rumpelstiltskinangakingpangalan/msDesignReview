@@ -64,7 +64,33 @@ async function initAvatarData() {
     companion_img_half = data[0].companion_img_half;
     companion_img_full = data[0].companion_img_full;
 
+    loadAvatar();
     await initPagesData();
+}
+
+function loadAvatar() {
+
+    let divAvatarHeader = document.querySelector('.divAvatarHeader');
+    let divGender = document.querySelector('#divGender');
+    let divAvatarBody = document.querySelector('.divAvatarBody');
+
+    if(kid_gender == 'male') {
+        divGender.children[0].style.display = "flex";
+        divGender.children[1].style.display = "none";
+    }
+    else {
+        divGender.children[0].style.display = "none";
+        divGender.children[1].style.display = "flex";
+    }
+
+    divAvatarHeader.children[1].textContent = kid_name.toUpperCase();
+    divAvatarHeader.children[3].textContent = kid_age + ' YEARS OLD'
+
+    kid_img_half? divAvatarBody.children[0].innerHTML =  `<img src ="${kid_img_half}">`: null;
+    kid_img_full? divAvatarBody.children[1].innerHTML = `<img src ="${kid_img_full}">`: null;
+    companion_img_half? divAvatarBody.children[2].innerHTML = `<img src ="${companion_img_half}">`: null;
+    companion_img_full? divAvatarBody.children[3].innerHTML = `<img src ="${companion_img_full}">`: null;
+
 }
 
 async function initPagesData() {
@@ -124,32 +150,37 @@ function createCoverPage() {
     let text_position = book.text_position.split(', ');
     
     let append = 
-    `<div id="divCoverPage" data-page="0">
-        <div id="coverBack">
-            ${book.pages['coverBack']}
-        </div>
-        <div id="coverFront">
-            ${book.pages['coverFront']}
-        </div>
+    `<div id="coverBack">
+        ${book.pages['coverBack']}
+    </div>
+    <div id="coverFront">
+        ${book.pages['coverFront']}
     </div>`        
 
+    main.firstElementChild.insertAdjacentHTML('beforeend', append);
+
+    append = "";
+
     for(let a = 1; a <= max_pages; a++) {
-        append += `<div class="divRegularPage" data-page="${a}" data-textposition="${text_position[a-1]}" data-pagetype="${page_type[a-1]}"></div>`
+        append += `<div class="divRegularPage" data-page="${a}" data-textposition="${text_position[a-1]}" data-pagetype="${page_type[a-1]}" data-shade="true"></div>`
     }
 
     main.insertAdjacentHTML('beforeend', append);
+
     focusPage();
-    
 }
 
 function focusPage() {
 
     let i;
     let main = document.querySelector('main');
+    let book = localData(book_title, kid_name);
+    let page_reference = book.references;
     let valPage = document.querySelector('#valPage')
     let focusBox = document.querySelector('#focusBox');
     let focusBoxT = focusBox.getBoundingClientRect().top;
     let focusBoxB = focusBox.getBoundingClientRect().bottom;
+    let divAvatarBody = document.querySelectorAll('.divAvatarBody')[1];
 
     for(let a = 0; a <= max_pages; a++) {
 
@@ -175,14 +206,20 @@ function focusPage() {
                 let starColor = arrFavs.includes(a) ? "#FFE100" : "#333333";
                 document.querySelector('#btnStar svg path').setAttribute("fill", starColor);
                 
-                a == 0? valPage.textContent = `COVER PAGE`: valPage.textContent = `PAGE ${a}`;
+                if(a == 0) {
+                    valPage.textContent = `COVER PAGE`;
+                    //update page reference based on current page
+                    divAvatarBody.innerHTML = `<img src ="${page_reference[`coverFront`]}" style="height: 90%; width: auto; margin: auto;">`;
+                }
+                else {
+                    valPage.textContent = `PAGE ${a}`;
+                    //update page reference based on current page
+                    divAvatarBody.innerHTML = `<img src ="${page_reference[`page${a}`]}" style="height: 90%; width: auto; margin: auto;">`;
+                }
+    
                 currPage = a;
                 //createpage downward
                 a + 1 <= max_pages? i = a + 1: i = a;
-
-                createRegularPage(i);
-
-                a + 2 <= max_pages? i = a + 2: i = a;
 
                 createRegularPage(i);
 
@@ -382,7 +419,6 @@ function updateZoom() {
 
             let divZoom = document.querySelector('#divZoom');
             divZoom.style.display = "block";
-            divZoom.style.zIndex = 2;
 
             setZoomSource(zoomTarget);
         }
@@ -420,6 +456,163 @@ function hideZoom() {
     if(zoomFrame) { cancelAnimationFrame(zoomFrame); zoomFrame = 0; }
     document.querySelector('#divZoom').style.display = "none";
     zoomSource = null;
+}
+
+function toggleAvatar() {
+
+    if(this.dataset.toggle == "false") {
+        boolAvatar = true;
+        this.dataset.toggle = "true";
+        this.style.background = "var(--theme-light)";
+        document.querySelector('#divAvatar').style.display = "flex";
+        setTimeout(() => {
+            document.querySelector('#divAvatar').style.opacity = 100;
+            document.querySelector('#contAvatar').style.opacity = 100;
+            document.querySelector('#contAvatar').style.scale = "100%";
+        }, 100)
+        
+    }
+    else {
+        boolAvatar = false;
+        this.dataset.toggle = "false";
+        this.style.background = "transparent";
+    
+        document.querySelector('#divAvatar').style.opacity = 0;
+        document.querySelector('#contAvatar').style.opacity = 0;
+        document.querySelector('#contAvatar').style.scale = "110%";
+
+        setTimeout(() => {
+            document.querySelector('#divAvatar').style.display = "none";
+        }, 100);
+
+        
+
+    }
+}
+
+function toggleShade() {
+
+    let page = document.querySelector(`.divRegularPage[data-page="${currPage}"]`);
+    if(!page) return;   // cover page has no text gradient to shade
+
+    // the text (and its gradient) lives in pageL when textposition is "L", otherwise pageR
+    let textHalf = page.dataset.textposition == "L" ? page.querySelector('.pageL') : page.querySelector('.pageR');
+    let textGradient = textHalf?.querySelector('.textGradient');
+    if(!textGradient) return;   // page has no text layer
+
+    if(page.dataset.shade == "true") {
+        page.dataset.shade = "false";
+        textGradient.style.visibility = "hidden";
+    }
+    else {
+        page.dataset.shade = "true";
+        textGradient.style.visibility = "visible";
+    }
+}
+
+async function downloadImage() {
+
+    let imageSource;
+
+    if(currPage == 0) {
+        // cover page: download the kid's image, which is the first child image of #coverFront
+        imageSource = document.querySelector('#coverFront img');
+    }
+    else {
+        let page = document.querySelector(`.divRegularPage[data-page="${currPage}"]`);
+        if(!page) return;
+
+        // the image-only half is the opposite of the text half: "L" -> pageR, otherwise pageL
+        let imageHalf = page.dataset.textposition == "L" ? page.querySelector('.pageR') : page.querySelector('.pageL');
+        imageSource = imageHalf?.querySelector('img');
+    }
+
+    if(!imageSource) return;
+
+    let fileName = `${book_id}_${currPage}.png`;
+
+    // fetch as a blob so the custom filename sticks (the download attribute is ignored for cross-origin urls)
+    let response = await fetch(imageSource.src);
+    let blob = await response.blob();
+    let objectURL = URL.createObjectURL(blob);
+
+    let link = document.createElement('a');
+    link.href = objectURL;
+    link.download = fileName;
+    link.click();
+
+    URL.revokeObjectURL(objectURL);
+}
+
+function uploadImage() {
+
+    let targetImage, minRatio, maxRatio, minWidth, minHeight;
+
+    if(currPage == 0) {
+        // cover page: replace the kid's image (first child image of #coverFront)
+        targetImage = document.querySelector('#coverFront img');
+        minRatio = 1.19;
+        maxRatio = 1.21;
+        minWidth = 3700;
+        minHeight = 3000;
+    }
+    else {
+        let page = document.querySelector(`.divRegularPage[data-page="${currPage}"]`);
+        if(!page) return;
+
+        // replace the image-only half (opposite of the text half): "L" -> pageR, otherwise pageL
+        let imageHalf = page.dataset.textposition == "L" ? page.querySelector('.pageR') : page.querySelector('.pageL');
+        targetImage = imageHalf?.querySelector('img');
+        minRatio = 1.36;
+        maxRatio = 1.38;
+        minWidth = 3400;
+        minHeight = 2500;
+    }
+
+    if(!targetImage) return;
+
+    // open a dialog limited to a single png
+    let fileInput = document.createElement('input');
+    fileInput.type = "file";
+    fileInput.accept = "image/png";
+
+    fileInput.onchange = () => {
+
+        let file = fileInput.files[0];
+        if(!file) return;
+
+        if(file.type != "image/png") {
+            document.querySelector('#alertBanner').style.display = "flex";
+            return;
+        }
+
+        let objectURL = URL.createObjectURL(file);
+        let probe = new Image();
+
+        // read the natural dimensions so we can validate aspect ratio + resolution before swapping it in
+        probe.onload = () => {
+
+            let aspectRatio = probe.width / probe.height;
+
+            if(aspectRatio < minRatio || aspectRatio > maxRatio) {
+                URL.revokeObjectURL(objectURL);
+                document.querySelector('#alertBanner').style.display = "flex";
+                return;
+            }
+
+            if(probe.width < minWidth || probe.height < minHeight) {
+                URL.revokeObjectURL(objectURL);
+                document.querySelector('#alertBanner').style.display = "flex";
+                return;
+            }
+
+            targetImage.src = objectURL;
+        };
+
+        probe.src = objectURL;
+    };
+
+    fileInput.click();
 }
 
 
