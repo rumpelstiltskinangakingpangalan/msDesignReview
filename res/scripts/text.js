@@ -9,11 +9,11 @@ function localData(book_title, kid_name) {
     text_position: "L, R, L, L, R, R, R, L, L, R, R, L, L, R, R, R, R, L, L, L, R, R",
     page_type: "A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A",
     fonts: `<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
-                <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
-                <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-                <link href="https://fonts.googleapis.com/css2?family=Reddit+Sans&display=swap" rel="stylesheet">
-                <link href="https://fonts.googleapis.com/css2?family=Sorcery&display=swap" rel="stylesheet">
-                <link href="https://fonts.googleapis.com/css2?family=Varelaround&display=swap" rel="stylesheet">`,
+            <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Reddit+Sans&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Sorcery&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Varelaround&display=swap" rel="stylesheet">`,
     pages: {
         coverBack: `<img src="https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/books/the_princess_within/cover.png" fetchpriority="high">
                     <div style="width: 110%; height: auto; position: absolute; scale: 62%; top: 40%; left: -3%;">
@@ -224,6 +224,31 @@ function localData(book_title, kid_name) {
                   <p style="text-align: center;"><span style="font-family: 'EB Garamond'; font-size: 2.5cqh; font-weight: 400; color: rgb(255, 255, 255);">For though she had visited kingdoms of thread, and tried on the dresses that shimmered and spread, </span><span style="font-family: 'EB Garamond'; font-size: 42px; font-weight: 400; color: rgb(255, 255, 255);">the lesson she learned is</span><span style="font-family: 'EB Garamond'; font-size: 2.5cqh; font-weight: 400; color: rgb(255, 255, 255);"> </span><em style="font-family: 'Playfair Display'; font-size: 4cqh; font-weight: 700; color: rgb(255, 168, 223);">simple and true</em><span style="font-family: 'Playfair Display'; font-size: 4cqh; font-weight: 700; color: rgb(255, 168, 223);">: </span><span style="font-family: 'EB Garamond'; font-size: 2.5cqh; font-weight: 400; color: rgb(255, 255, 255);">the magic was never the gown,</span></p>
                   <p style="text-align: center;"><em style="font-family: 'Playfair Display'; font-size: 4cqh; font-weight: 700; color: rgb(255, 168, 223);">${kid_name}, it's YOU.</em></p>
                 </div>`,
+    },
+    references: {
+      coverFront: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/0.png`,
+      page1: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/1.png`,
+      page2: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/2.png`,
+      page3: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/3.png`,
+      page4: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/4.png`,
+      page5: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/5.png`,
+      page6: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/6.png`,
+      page7: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/7.png`,
+      page8: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/8.png`,
+      page9: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/9.png`,
+      page10: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/10.png`,
+      page11: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/11.png`,
+      page12: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/12.png`,
+      page13: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/13.png`,
+      page14: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/14.png`,
+      page15: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/15.png`,
+      page16: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/16.png`,
+      page17: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/17.png`,
+      page18: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/18.png`,
+      page19: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/19.png`,
+      page20: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/20.png`,
+      page21: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/21.png`,
+      page22: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/template_images/the_princess_within/22.png`,
     }
 }
 

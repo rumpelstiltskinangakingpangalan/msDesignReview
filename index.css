@@ -5,7 +5,7 @@
     --theme-dark: hsl(0 0% 11%);
     --theme-med: hsl(0 0% 15%);
     --theme-light: hsl(0 0% 20%);
-    --theme-shadow: hsl(0 0% 0% / 0.25); 
+    --theme-shadow: hsl(0 0% 0% / .5); 
     --theme-scroll-thumb: hsl(0 0% 30%);
     --theme-dark-color:  hsl(235 35% 15%);
     --theme-light-color: hsl(235 60% 70%);
@@ -13,7 +13,10 @@
     --text-muted: hsl(0 0 70);
     --text-sharp: hsl(0 0 95);
     --text-font: "M PLUS Rounded 1c", sans-serif;
+    --text-font-inter:  "Inter", sans-serif;
     --text-semibold: 800;
+    --text-regular: 400;
+    --text-medium: 500;
     --unit1: 4px;
     --unit2: 8px;
     --unit3: 16px;
@@ -23,6 +26,14 @@
 * {
   scrollbar-width: thick;
   scrollbar-color: var(--theme-scroll-thumb) var(--theme-med); /* thumb track */
+}
+
+h1 {
+    cursor: default;
+}
+
+p {
+    cursor: default;
 }
 
 body {
@@ -54,14 +65,59 @@ body {
 header {
     width: 100vw;
     height: auto;
+    position: relative;
+    z-index: 2;
 }
 
 nav {
     background: var(--theme-dark);
     width: 100%;
     height: calc(var(--unit1) * 10);
-    box-shadow: 0px 1px 15px var(--theme-shadow);
+    box-shadow: 0px 1px 10px var(--theme-shadow);
     display: flex;
+}
+
+#alertBanner {
+    width: 100vw;
+    height: 24px;
+    background: lightcoral;
+    position: absolute;
+    display: flex;
+    box-shadow: 0px 1px 10px var(--theme-shadow);
+    justify-content: center;
+    display: none;
+}
+
+.h1sharpError {
+    font-size: 13px;
+    font-family: var(--text-font-inter);
+    color: var(--text-sharp);
+    letter-spacing: 5%;
+    font-weight: 600;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+#btnDismiss {
+    font-size: calc(var(--unit1) * 3);
+    font-family: var(--text-font-inter);
+    letter-spacing: 5%;
+    font-weight: var(--text-medium);
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: var(--unit3);
+    width: 64px;
+    height: 18px;
+    display: flex;
+    background: white;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+#btnDismiss h1 {
+    margin: auto;
+    color: lightcoral;
+    cursor: pointer;
 }
 
 #logo {
@@ -99,25 +155,23 @@ nav {
 
 #focusBox {
     width: 100%;
-    height: calc(50% - var(--unit4));
-    top: 25%;
+    height: calc(60% - var(--unit4));
+    top: 20%;
     position: absolute;
-
 }
 
 main {
 
     width: 100vw;
-    height: calc(100vh - 80px - 40px - 128px - (var(--unit3) * 2));
+    height: calc(100vh - 80px - 40px - 64px - 48px);
     background: transparent;
     display: flex;
     flex-direction: column;
     gap: calc(4* var(--unit4));
     padding-top: calc(2* var(--unit4));
-    padding-bottom: calc(2* var(--unit4));
     overflow-y: auto;
-    margin-top: var(--unit3);
-    margin-bottom: var(--unit3);
+    margin-top: 24px;
+    margin-bottom: 24px;
     position: relative;
 }
 
@@ -201,10 +255,12 @@ main {
 
 footer {
     width: 100vw;
+    display: flex;
+    z-index: 2;
+    position: relative;
     height: calc(var(--unit1) * 20);
     background: var(--theme-dark);
-    display: flex;
-    box-shadow: 0px -1px 15px var(--theme-shadow);
+    box-shadow: 0px -1px 10px var(--theme-shadow);
 }
 
 .wrapperFooter {
@@ -244,19 +300,17 @@ footer {
 }
 
 #dropdown {
-    width: calc(100% - 8px);
+    width: 100%;
     height: 200px;
     position: absolute;
     background: var(--bg);
     border-radius: var(--unit2);
-    border: 1px solid var(--theme-light);
+    border: 1px solid var(--theme-med);
     top: -204px;
     left: -1px;
     box-shadow: 0px 0px 2px 0px rgba(0,0,0,1);
     overflow: auto;
     scroll-snap-type: y mandatory;
-    padding-left: var(--unit1);
-    padding-right: var(--unit1);
     visibility: hidden;
 }
 
@@ -266,7 +320,6 @@ footer {
     width: 100%;
     display: flex;
     scroll-snap-align: start;
-    border-radius: var(--unit1);
 }
 
 .optPages:hover {
@@ -321,19 +374,11 @@ footer {
     cursor: pointer;
 }
 
-#btnStar:hover {
-    background: var(--theme-light);
-}
-
 #btnStar svg {
     width: 40%;
     height: auto;
     margin: auto;
     margin-right: var(--unit2);
-}
-
-#btnStar:hover svg {
-    filter: brightness(500%);
 }
 
 #valPage {
@@ -418,6 +463,140 @@ footer {
     margin: auto;
     margin-right: var(--unit2);
 }
+
+
+#divZoom {
+    width: 150px;
+    height: 150px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 999px;
+    overflow: hidden;
+    pointer-events: none;
+    display: none;
+    box-shadow: 0 0 0 2px #fff, 0 6px 16px rgba(0, 0, 0, 0.35);
+    will-change: transform;
+    z-index: 9;
+}
+
+#divZoom img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    will-change: transform;
+}
+
+#divAvatar {
+    
+    width: 100vw;
+    height: calc(100vh - 80px - 40px);
+    background: var(--bg);
+    position: absolute;
+    top: 40px;
+    display: none;
+    opacity: 0;
+    transition: .1s;
+    z-index: 2;
+}
+
+#contAvatar {
+    width: 960px; height: 90%; margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    opacity: 0;
+    transition-duration: .1s;
+    transition-delay: .1s;
+    scale: 110%;
+}
+
+.divAvatarHori {
+    width: 100%;
+    height: 80%;
+    margin: auto;
+    border: 1px solid var(--theme-med);
+    border-radius: var(--unit2);
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+}
+
+.divAvatarHeader {
+    height: var(--unit4);
+    width: 100%;
+    background: var(--theme-dark);
+    border-top-left-radius: var(--unit2);
+    border-top-right-radius: var(--unit2);
+    display: flex;
+}
+
+#divGender {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: var(--unit3);
+    margin-left: var(--unit3);
+}
+
+#divGender svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    margin: auto;
+}
+
+.divAvatarBody {
+    display: flex;
+    width: 100%;
+    height: 300px;
+    margin: auto;
+    border-radius: var(--unit1);
+}
+
+
+.divAvatarCard {
+    width: 260px;
+    height: 260px;
+    aspect-ratio: 1;
+    margin: auto;
+    border-radius: var(--unit1);
+    background: var(--bg);
+    border: 1px solid var(--theme-light);
+    display: flex;
+    overflow: hidden;
+}
+
+.divAvatarCard svg {
+    margin: auto;
+    width: auto;
+    height: 40%;
+    aspect-ratio: 1;
+}
+
+.divAvatarCardHori {
+    width: auto;
+    height: 260px;
+    margin: auto;
+    aspect-ratio: 0.558;
+    border-radius: var(--unit1);
+    background: var(--bg);
+    border: 1px solid var(--theme-light);
+    display: flex;
+    overflow: hidden;
+}
+
+.divAvatarCardHori svg {
+    margin: auto;
+    width: auto;
+    height: 40%;
+    aspect-ratio: 1;
+}
+
+
 
 
 

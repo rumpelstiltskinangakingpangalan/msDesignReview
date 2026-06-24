@@ -7,9 +7,9 @@ const msSupabase = supabase.createClient(supabaseUrl, supabaseKey);
 let book_id = "1e461b89-f9f3-45a4-b36f-479ed823336d";
 
 let pages = [];
-
+let boolZoom, boolAvatar = false;
 let order_id, book_title, max_pages, kid_name, kid_age, kid_gender, kid_img_half, kid_img_full, 
-companion_name, companion_img_half, companion_img_full, favorites;
+companion_name, companion_img_half, companion_img_full, arrFavs, currPage;
 
 let bucketURL = `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/sample_images/${book_id}/0.png`;
 
@@ -92,7 +92,7 @@ async function initFavorites() {
     .select(`design_review_fav`)
     .eq("book_id", book_id)
 
-    favorites = data[0].img_review_fav ? JSON.parse(data[0].img_review_fav) : [];
+    arrFavs = data[0].design_review_fav ? JSON.parse(data[0].design_review_fav) : [];
 
     initUI();
 }
@@ -171,8 +171,12 @@ function focusPage() {
 
             //NOW CHECK IF THE PAGE ENTERS TOP AND MID OR BOTTOM AND MID (DOMINATES THE FOCUS BOX AT 50%)
             if((boolTop && boolMiddle) || (boolBottom && boolMiddle) || boolMiddle) {
-                a == 0? valPage.textContent = `COVER PAGE`: valPage.textContent = `PAGE ${a}`;
 
+                let starColor = arrFavs.includes(a) ? "#FFE100" : "#333333";
+                document.querySelector('#btnStar svg path').setAttribute("fill", starColor);
+                
+                a == 0? valPage.textContent = `COVER PAGE`: valPage.textContent = `PAGE ${a}`;
+                currPage = a;
                 //createpage downward
                 a + 1 <= max_pages? i = a + 1: i = a;
 
@@ -249,6 +253,7 @@ function resetOptPages () {
     for(let a = 0; a <= max_pages; a++) {
 
         let pagecount = `PAGE ${a}`;
+        let starColor = arrFavs.includes(a) ? "#FFE100" : "#333333";
 
         if(a == 0) {
             pagecount  = `COVER PAGE`;
@@ -258,7 +263,7 @@ function resetOptPages () {
         `<div class="optPages">
             <div class="contStar">
                 <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5.87145 0.492998C6.25809 -0.164341 7.2087 -0.164341 7.59535 0.492999L9.11293 3.07306C9.25376 3.31249 9.48783 3.48255 9.75906 3.5425L12.6818 4.18853C13.4265 4.35312 13.7202 5.2572 13.2145 5.82805L11.2297 8.06864C11.0455 8.27657 10.9561 8.55173 10.9829 8.82821L11.2717 11.8075C11.3452 12.5666 10.5762 13.1254 9.877 12.8208L7.13273 11.6255C6.87806 11.5146 6.58874 11.5146 6.33407 11.6255L3.58979 12.8208C2.89062 13.1254 2.12156 12.5666 2.19513 11.8075L2.4839 8.82821C2.5107 8.55173 2.4213 8.27657 2.23711 8.06864L0.252278 5.82805C-0.25341 5.2572 0.0403444 4.35312 0.784992 4.18853L3.70774 3.5425C3.97897 3.48255 4.21304 3.31249 4.35386 3.07306L5.87145 0.492998Z" fill="#333333"/>
+                    <path d="M5.87145 0.492998C6.25809 -0.164341 7.2087 -0.164341 7.59535 0.492999L9.11293 3.07306C9.25376 3.31249 9.48783 3.48255 9.75906 3.5425L12.6818 4.18853C13.4265 4.35312 13.7202 5.2572 13.2145 5.82805L11.2297 8.06864C11.0455 8.27657 10.9561 8.55173 10.9829 8.82821L11.2717 11.8075C11.3452 12.5666 10.5762 13.1254 9.877 12.8208L7.13273 11.6255C6.87806 11.5146 6.58874 11.5146 6.33407 11.6255L3.58979 12.8208C2.89062 13.1254 2.12156 12.5666 2.19513 11.8075L2.4839 8.82821C2.5107 8.55173 2.4213 8.27657 2.23711 8.06864L0.252278 5.82805C-0.25341 5.2572 0.0403444 4.35312 0.784992 4.18853L3.70774 3.5425C3.97897 3.48255 4.21304 3.31249 4.35386 3.07306L5.87145 0.492998Z" fill="${starColor}"/>
                 </svg>
             </div>
             <p class="h1sharp">${pagecount}</p>
@@ -287,18 +292,135 @@ function goToPage() {
         top: main.children[i].offsetTop - offset,
         behavior: "instant"
     });
-    /*
-    document.querySelector('main').children[i]?.scrollIntoView({
-        behavior: "instant",
-        block: "start"
-    });
-    */
 
     focusPage();
 
 }
 
+async function updateFavorites() {
 
+    if(arrFavs.includes(currPage)) {
+        arrFavs = arrFavs.filter(item => item !== currPage);
+    }
+    else {
+        arrFavs.push(currPage);
+    }
+
+    resetOptPages();
+
+    let starColor = arrFavs.includes(currPage) ? '#FFE100' : '#333333';
+    let starFilter = arrFavs.includes(currPage) ? 'none' : 'brightness(500%)';
+    document.querySelector('#btnStar svg path').setAttribute("fill", starColor);
+    document.querySelector('#btnStar svg path').style.filter = starFilter;
+
+    let { data, error } = await msSupabase
+    .from("table_favorites")
+    .update({
+        design_review_fav: JSON.stringify(arrFavs)
+    })
+    .eq("book_id", book_id)
+
+}
+
+function toggleZoom() {
+
+    if(this.dataset.toggle == "false") {
+        boolZoom = true;
+        this.dataset.toggle = "true";
+        this.style.background = "var(--theme-light)";
+        
+    }
+    else {
+        boolZoom = false;
+        this.dataset.toggle = "false";
+        this.style.background = "transparent";
+        hideZoom();
+    }
+}
+
+let zoomFactor = 2;           
+let zoomSource = null;       
+let zoomClone  = null;       
+let lensRadius = 75;           
+let cursorX = 0, cursorY = 0;  
+let zoomFrame = 0;             
+
+function setZoomSource(img) {
+
+    let divZoom = document.querySelector('#divZoom');
+    let imgBox = img.getBoundingClientRect();
+
+    if(!zoomClone || zoomClone.src !== img.src) {
+        divZoom.replaceChildren();
+        zoomClone = img.cloneNode(true);
+        divZoom.appendChild(zoomClone);
+    }
+
+    zoomClone.style.width  = imgBox.width  * zoomFactor + 'px';
+    zoomClone.style.height = imgBox.height * zoomFactor + 'px';
+    lensRadius = divZoom.offsetWidth / 2;
+    zoomSource = img;
+}
+
+function updateZoom() {
+
+    if(!boolZoom) {
+        hideZoom();
+        return;
+    }
+
+    let underCursor = document.elementFromPoint(cursorX, cursorY);
+
+    // these holders can stack layers (gradient/text) over their image, so always
+    // inspect the first image child rather than whatever sits on top under the cursor
+    let imageHolder = underCursor?.closest('#coverFront, .pageL, .pageR');
+    let zoomTarget = imageHolder ? imageHolder.querySelector('img') : underCursor;
+
+    if(zoomTarget && zoomTarget.tagName === "IMG") {
+
+        if(zoomTarget !== zoomSource) {
+
+            let divZoom = document.querySelector('#divZoom');
+            divZoom.style.display = "block";
+            divZoom.style.zIndex = 2;
+
+            setZoomSource(zoomTarget);
+        }
+        renderZoom();
+    }
+    else {
+        hideZoom();
+    }
+}
+
+function queueZoom() {
+
+    if(zoomFrame) return;
+    zoomFrame = requestAnimationFrame(() => {
+        zoomFrame = 0;
+        updateZoom();
+    });
+}
+
+function renderZoom() {
+
+    if(!zoomSource || !zoomClone) return;
+
+    let imgBox = zoomSource.getBoundingClientRect();
+    let spotX = cursorX - imgBox.left;      
+    let spotY = cursorY - imgBox.top;
+
+    document.querySelector('#divZoom').style.transform = `translate(${cursorX - lensRadius}px, ${cursorY - lensRadius}px)`;
+
+    zoomClone.style.transform = `translate(${lensRadius - spotX * zoomFactor}px, ${lensRadius - spotY * zoomFactor}px)`;
+}
+
+function hideZoom() {
+
+    if(zoomFrame) { cancelAnimationFrame(zoomFrame); zoomFrame = 0; }
+    document.querySelector('#divZoom').style.display = "none";
+    zoomSource = null;
+}
 
 
 
