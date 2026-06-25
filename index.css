@@ -143,6 +143,141 @@ nav {
     background: var(--theme-light);
 }
 
+.hBar {
+    height: 1px;
+    margin: auto;
+    background: var(--theme-light);
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+#contextMenu {
+    width: 220px;
+    position: fixed;
+    background: var(--bg);
+    border: 1px solid var(--theme-light);
+    border-radius: var(--unit2);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, .5);
+    z-index: 4;
+    display: none;
+    padding-bottom: 4px;
+    padding-top: 4px;
+}
+
+.optContext {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.optContext h1 {
+    cursor: pointer;
+}
+
+.optContext:hover {
+    background: var(--theme-light);
+}
+
+.optContext:hover h1 {
+    color: var(--text-sharp);
+    
+}
+
+.iconContext {
+    width: 18px;
+    height: 18px;
+    margin: 1em;
+    display: flex;
+}
+
+.iconContext svg {
+    width: auto;
+    height: 100%;
+    margin: auto;
+}
+
+.optContext p {
+    margin: 0;
+}
+
+#divNotes {
+    width: 300px;
+    position: fixed;
+    background: var(--bg);
+    border: 1px solid var(--theme-light);
+    border-radius: var(--unit2);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, .5);
+    overflow: hidden;
+    z-index: 4;
+    display: none;
+    padding: 0.5em;
+}
+
+#txtNotes {
+    width: 100%;
+    height: 150px;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--text-font-inter);
+    font-weight: 600;
+    font-size: 13px;
+    resize: none;
+    padding: .5em;
+    letter-spacing: 10%;
+    line-height: 2em;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-scroll-thumb) var(--theme-med);
+}
+
+#txtNotes:focus {
+    outline: none;
+}
+
+#notesActions {
+    display: flex;
+}
+
+.btnNotes {
+    width: 150px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--unit2);
+    cursor: pointer;
+    border-radius: var(--unit1);
+}
+
+.btnNotes h1 {
+    cursor: pointer;
+}
+
+.btnNotes:hover {
+    background: var(--theme-light);
+}
+
+.btnNotes:hover h1 {
+    color: var(--text-sharp);
+}
+
+.iconNote {
+    width: 16px;
+    height: 16px;
+    display: flex;
+}
+
+.iconNote svg {
+    width: auto;
+    height: 100%;
+    margin: auto;
+}
+
 #btnCopy {
     width: var(--unit3);
     height: var(--unit3);
@@ -153,22 +288,27 @@ nav {
     margin-right: var(--unit4);
 }
 
+#btnCopy:hover svg {
+    filter: brightness(110%);
+}
+
 #focusBox {
     width: 100%;
-    height: calc(60% - var(--unit4));
-    top: 20%;
+    height: calc(70% - var(--unit4));
+    top: 15%;
     position: absolute;
 }
 
 main {
 
     width: 100vw;
-    height: calc(100vh - 80px - 40px - 64px - 48px);
+    height: calc(100vh - 80px - 40px - 64px - 48px - 128px);
     background: transparent;
     display: flex;
     flex-direction: column;
     gap: calc(4* var(--unit4));
     padding-top: calc(2* var(--unit4));
+    padding-bottom: calc(4* var(--unit4));
     overflow-y: auto;
     margin-top: 24px;
     margin-bottom: 24px;
@@ -309,6 +449,7 @@ footer {
     top: -204px;
     left: -1px;
     box-shadow: 0px 0px 2px 0px rgba(0,0,0,1);
+    box-shadow: 0px 1px 10px rgba(0, 0, 0, .5);
     overflow: auto;
     scroll-snap-type: y mandatory;
     visibility: hidden;
@@ -317,7 +458,7 @@ footer {
 .optPages {
     min-height: 40px;
     height: 40px;
-    width: 100%;
+    width: calc(100% - 4px);
     display: flex;
     scroll-snap-align: start;
 }
@@ -333,22 +474,28 @@ footer {
     margin-right: var(--unit2);
 }
 
-.optPages:hover svg {
-    filter: brightness(500%);
+.optPages:not(.fav):hover svg {
+    filter: brightness(55%);
 }
 
-.optPages p {
+.optPages h1 {
     margin: auto;
+}
+
+.optPages:hover h1 {
+    color: var(--text-sharp);
 }
 
 .contStar {
     width: calc(var(--unit1) * 10);
     height: 100%;
     display: flex;
+    
 }
 
 .contStar svg {
     margin: auto;
+    margin-right: var(--unit2);
 }
 
 #divTools {
@@ -508,8 +655,7 @@ footer {
     gap: 2em;
     opacity: 0;
     transition-duration: .1s;
-    transition-delay: .1s;
-    scale: 110%;
+    scale: 105%;
 }
 
 .divAvatarHori {
@@ -557,13 +703,17 @@ footer {
     border-radius: var(--unit1);
 }
 
+.divAvatarBody img {
+    border-radius: var(--unit2);
+}
+
 
 .divAvatarCard {
     width: 260px;
     height: 260px;
     aspect-ratio: 1;
     margin: auto;
-    border-radius: var(--unit1);
+    border-radius: var(--unit2);
     background: var(--bg);
     border: 1px solid var(--theme-light);
     display: flex;
@@ -582,7 +732,7 @@ footer {
     height: 260px;
     margin: auto;
     aspect-ratio: 0.558;
-    border-radius: var(--unit1);
+    border-radius: var(--unit2);
     background: var(--bg);
     border: 1px solid var(--theme-light);
     display: flex;

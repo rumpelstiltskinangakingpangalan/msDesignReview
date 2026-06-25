@@ -7,6 +7,7 @@ const msSupabase = supabase.createClient(supabaseUrl, supabaseKey);
 let book_id = "1e461b89-f9f3-45a4-b36f-479ed823336d";
 
 let pages = [];
+let arrNotes = [];
 let boolZoom, boolAvatar = false;
 let order_id, book_title, max_pages, kid_name, kid_age, kid_gender, kid_img_half, kid_img_full, 
 companion_name, companion_img_half, companion_img_full, arrFavs, currPage;
@@ -108,6 +109,7 @@ async function initPagesData() {
     }
 
     await initFavorites();
+    await initNotes();
     resetOptPages();
 }
 
@@ -121,6 +123,21 @@ async function initFavorites() {
     arrFavs = data[0].design_review_fav ? JSON.parse(data[0].design_review_fav) : [];
 
     initUI();
+}
+
+// load every saved note once at startup so opening the popup reads from the cache, not supabase
+async function initNotes() {
+
+    let { data } = await msSupabase
+    .from("table_notes")
+    .select("page, design_review_notes")
+    .eq("book_id", book_id);
+
+    arrNotes = [];
+
+    if(data) {
+        data.forEach(row => arrNotes[row.page] = row.design_review_notes || "");
+    }
 }
 
 function initUI() {
@@ -291,20 +308,21 @@ function resetOptPages () {
 
         let pagecount = `PAGE ${a}`;
         let starColor = arrFavs.includes(a) ? "#FFE100" : "#333333";
+        let favClass = arrFavs.includes(a) ? " fav" : "";
 
         if(a == 0) {
             pagecount  = `COVER PAGE`;
         }
 
         append +=
-        `<div class="optPages">
+        `<div class="optPages${favClass}">
             <div class="contStar">
                 <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M5.87145 0.492998C6.25809 -0.164341 7.2087 -0.164341 7.59535 0.492999L9.11293 3.07306C9.25376 3.31249 9.48783 3.48255 9.75906 3.5425L12.6818 4.18853C13.4265 4.35312 13.7202 5.2572 13.2145 5.82805L11.2297 8.06864C11.0455 8.27657 10.9561 8.55173 10.9829 8.82821L11.2717 11.8075C11.3452 12.5666 10.5762 13.1254 9.877 12.8208L7.13273 11.6255C6.87806 11.5146 6.58874 11.5146 6.33407 11.6255L3.58979 12.8208C2.89062 13.1254 2.12156 12.5666 2.19513 11.8075L2.4839 8.82821C2.5107 8.55173 2.4213 8.27657 2.23711 8.06864L0.252278 5.82805C-0.25341 5.2572 0.0403444 4.35312 0.784992 4.18853L3.70774 3.5425C3.97897 3.48255 4.21304 3.31249 4.35386 3.07306L5.87145 0.492998Z" fill="${starColor}"/>
                 </svg>
             </div>
-            <p class="h1sharp">${pagecount}</p>
-            <div style="width: 24px; height: 100%;"></div>
+            <h1 class="h1muted">${pagecount}</h1>
+            <div style="width: 20px; height: 100%;"></div>
         </div>`
     }
 
@@ -469,7 +487,7 @@ function toggleAvatar() {
             document.querySelector('#divAvatar').style.opacity = 100;
             document.querySelector('#contAvatar').style.opacity = 100;
             document.querySelector('#contAvatar').style.scale = "100%";
-        }, 100)
+        }, 50)
         
     }
     else {
@@ -479,7 +497,7 @@ function toggleAvatar() {
     
         document.querySelector('#divAvatar').style.opacity = 0;
         document.querySelector('#contAvatar').style.opacity = 0;
-        document.querySelector('#contAvatar').style.scale = "110%";
+        document.querySelector('#contAvatar').style.scale = "105%";
 
         setTimeout(() => {
             document.querySelector('#divAvatar').style.display = "none";
@@ -582,7 +600,7 @@ function uploadImage() {
         if(!file) return;
 
         if(file.type != "image/png") {
-            document.querySelector('#alertBanner').style.display = "flex";
+            showAlert("⚠ Upload Failed: Please check the image aspect ratio and resolution");
             return;
         }
 
@@ -596,13 +614,13 @@ function uploadImage() {
 
             if(aspectRatio < minRatio || aspectRatio > maxRatio) {
                 URL.revokeObjectURL(objectURL);
-                document.querySelector('#alertBanner').style.display = "flex";
+                showAlert("⚠ Upload Failed: Please check the image aspect ratio and resolution");
                 return;
             }
 
             if(probe.width < minWidth || probe.height < minHeight) {
                 URL.revokeObjectURL(objectURL);
-                document.querySelector('#alertBanner').style.display = "flex";
+                showAlert("⚠ Upload Failed: Please check the image aspect ratio and resolution");
                 return;
             }
 
@@ -613,6 +631,127 @@ function uploadImage() {
     };
 
     fileInput.click();
+}
+
+function hideDropdown() {
+    document.querySelector('#dropPages').dataset.show = "false";
+    document.querySelector('#dropdown').style.visibility = "hidden";
+}
+
+// close every popup (dropdown, context menu, notes) — only one may be open at a time
+function closePopups() {
+    hideDropdown();
+    hideContextMenu();
+    hideNotes();
+}
+
+function showContextMenu(x, y) {
+
+    hideDropdown();   // only one popup open at a time
+    hideNotes();
+
+    let contextMenu = document.querySelector('#contextMenu');
+    contextMenu.style.display = "block";   // make it measurable before clamping
+
+    // keep the menu inside the viewport
+    let posX = Math.min(x, window.innerWidth - contextMenu.offsetWidth - 4);
+    let posY = Math.min(y, window.innerHeight - contextMenu.offsetHeight - 4);
+
+    contextMenu.style.left = posX + 'px';
+    contextMenu.style.top = posY + 'px';
+}
+
+function hideContextMenu() {
+    document.querySelector('#contextMenu').style.display = "none";
+}
+
+function addNotes() {
+
+    hideDropdown();        // only one popup open at a time
+    hideContextMenu();
+
+    let contextMenu = document.querySelector('#contextMenu');
+    let divNotes = document.querySelector('#divNotes');
+    let txtNotes = document.querySelector('#txtNotes');
+
+    // pull this page's note from the local cache — no supabase round-trip, no flicker
+    txtNotes.value = arrNotes[currPage] || "";
+
+    divNotes.style.display = "block";   // make it measurable before clamping
+
+    // open where the context menu was, clamped so the wider window still fits the viewport
+    let x = parseFloat(contextMenu.style.left) || 0;
+    let y = parseFloat(contextMenu.style.top) || 0;
+
+    divNotes.style.left = Math.min(x, window.innerWidth - divNotes.offsetWidth - 4) + 'px';
+    divNotes.style.top = Math.min(y, window.innerHeight - divNotes.offsetHeight - 4) + 'px';
+}
+
+function hideNotes() {
+    document.querySelector('#divNotes').style.display = "none";
+}
+
+// show the pink banner with a message (the warning triangle is part of the message string)
+function showAlert(message) {
+    let alertBanner = document.querySelector('#alertBanner');
+    alertBanner.querySelector('h1').textContent = message;
+    alertBanner.style.display = "flex";
+}
+
+async function solveNote() {
+
+    arrNotes[currPage] = "";   // cache locally first, then clear the row in supabase
+    hideNotes();
+
+    let { error } = await msSupabase
+    .from("table_notes")
+    .update({ design_review_notes: "" })
+    .eq("book_id", book_id)
+    .eq("page", currPage);
+
+    if(error) {
+        showAlert("⚠ Saving Failed: Please try again later");
+    }
+}
+
+async function saveNote() {
+
+    let notes = document.querySelector('#txtNotes').value;
+
+    arrNotes[currPage] = notes;   // cache locally first, then persist to supabase
+    hideNotes();
+
+    // does a row already exist for this book + page?
+    let { data } = await msSupabase
+    .from("table_notes")
+    .select("page")
+    .eq("book_id", book_id)
+    .eq("page", currPage);
+
+    let error;
+
+    if(data && data.length > 0) {
+        let res = await msSupabase
+        .from("table_notes")
+        .update({ design_review_notes: notes })
+        .eq("book_id", book_id)
+        .eq("page", currPage);
+        error = res.error;
+    }
+    else {
+        let res = await msSupabase
+        .from("table_notes")
+        .insert({ book_id: book_id, page: currPage, design_review_notes: notes });
+        error = res.error;
+    }
+
+    if(error) {
+        showAlert("⚠ Saving Failed: Please try again later");
+    }
+}
+
+function viewInImageReview() {
+    // TODO: open the current page in Image Review (currPage)
 }
 
 
