@@ -8,28 +8,12 @@ let book_id = "1e461b89-f9f3-45a4-b36f-479ed823336d";
 
 let pages = [];
 let arrNotes = [];
-let loadCursor = 0;   // page the sequential loader is currently completing (0 = cover first)
-let loadTimer; 
+let loadCursor = 0;
+let loadTimer;
 let boolZoom, boolAvatar = false;
-let order_id, book_title, max_pages, kid_name, kid_age, kid_gender, kid_img_half, kid_img_full, 
+let order_id, book_title, max_pages, kid_name, kid_age, kid_gender, kid_img_half, kid_img_full,
 companion_name, companion_img_half, companion_img_full, arrFavs, currPage;
 
-/*
-async function addPages() {
-
-    //for(let a = 2; a < 22; a++) {
-        await msSupabase
-        .from("table_pages_2")
-        .insert({
-            order_id: order_id,
-            book_id: book_id,
-            page: 22,
-            image_url: `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/sample_images/${book_id}/${22}.png`
-        });
-
-    //}    
-}
-*/
 
 async function initBookData() {
 
@@ -42,8 +26,6 @@ async function initBookData() {
     book_title = data[0].book_title;
     max_pages = data[0].max_pages;
 
-    //SEARCH TEXT.JS FOR BOOKS OBJECT WITH THE SAME TITLE AND GET IT'S INDEX
-    //i = books.findIndex(b => b.title === book_title);
 
     await initAvatarData();
 }
@@ -125,7 +107,6 @@ async function initFavorites() {
     initUI();
 }
 
-// load every saved note once at startup so opening the popup reads from the cache, not supabase
 async function initNotes() {
 
     let { data } = await msSupabase
@@ -141,8 +122,7 @@ async function initNotes() {
 }
 
 function initUI() {
-    
-    //UPDATE UI BOOKTITLE AND ORDER ID
+
     document.title = order_id + ` - Design Review`;
     document.querySelector('#bookTitle').textContent = book_title.toUpperCase();
     document.querySelector('#orderID').textContent = `ORDER ID: ${order_id}`;
@@ -162,18 +142,18 @@ function createCoverPage() {
     let append = "";
     let main = document.querySelector('main');
     let book = localData(book_title, kid_name);
-    
+
     let page_text = book.pages;
     let page_type = book.page_type.split(', ');
     let text_position = book.text_position.split(', ');
-    
-    main.firstElementChild.innerHTML = 
+
+    main.firstElementChild.innerHTML =
     `<div id="coverBack">
         ${book.pages['coverBack']}
     </div>
     <div id="coverFront">
         ${book.pages['coverFront']}
-    </div>`        
+    </div>`
 
     for(let a = 1; a <= max_pages; a++) {
         append +=
@@ -185,6 +165,7 @@ function createCoverPage() {
     checkPageIfComplete(main.firstElementChild, 0)
 
     focusPage();
+    initSettings();
 }
 
 function focusPage() {
@@ -207,32 +188,26 @@ function focusPage() {
             let focusPageB = focusPage.getBoundingClientRect().bottom;
             let focusPageM = focusPage.getBoundingClientRect().top + focusPage.getBoundingClientRect().height / 2;
 
-            //CHECK IF CURRENT PAGE TOP SIDE ENTERS THE FOCUS BOX
             let boolTop = (focusPageT > focusBoxT) && (focusPageT < focusBoxB);
 
-            //CHECK IF CURRENT PAGE BOTTOM SIDE ENTERS THE FOCUS BOX
             let boolBottom = (focusPageB > focusBoxT) && (focusPageB < focusBoxB);
 
-            //CHECK IF CURRENT PAGE MIDDLE PART ENTERS THE FOCUS BOX
             let boolMiddle = (focusPageM > focusBoxT) && (focusPageM < focusBoxB);
 
-            //NOW CHECK IF THE PAGE ENTERS TOP AND MID OR BOTTOM AND MID (DOMINATES THE FOCUS BOX AT 50%)
             if((boolTop && boolMiddle) || (boolBottom && boolMiddle) || boolMiddle) {
 
                 let starColor = arrFavs.includes(a) ? "#FFE100" : "#333333";
                 document.querySelector('#btnStar svg path').setAttribute("fill", starColor);
-                
+
                 if(a == 0) {
                     valPage.textContent = `COVER PAGE`;
-                    //update page reference based on current page
                     divAvatarBody.innerHTML = `<img src ="${page_reference[`coverFront`]}" style="height: 90%; width: auto; margin: auto;">`;
                 }
                 else {
                     valPage.textContent = `PAGE ${a}`;
-                    //update page reference based on current page
                     divAvatarBody.innerHTML = `<img src ="${page_reference[`page${a}`]}" style="height: 90%; width: auto; margin: auto;">`;
                 }
-    
+
                 currPage = a;
 
             }
@@ -246,16 +221,16 @@ function createRegularPage(i) {
     let append = "";
     let main = document.querySelector('main');
     let book = localData(book_title, kid_name);
-    let text_position = book.text_position.split(', ');
-    let page_type = book.page_type.split(', ');
+    let text_position = main.children[i].dataset.textposition;
+    let page_type = main.children[i].dataset.pagetype;
     let page_text = book.pages;
 
 
     if(i >= 1 && i <= max_pages && main.children[i].childElementCount == 0) {
 
-        if(text_position[i-1] == "L") {
+        if(text_position == "L") {
 
-            append = 
+            append =
             `<div class="pageL" style = "position: relative;">
                 <img src ="https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/books/${book_title.replaceAll(' ', '_').toLowerCase()}/${i}.png" fetchpriority="high" style="position: relative;">
                 <div class = "textGradient" style="background: linear-gradient(to right, rgba(0,0,0,1), transparent); "></div>
@@ -265,13 +240,13 @@ function createRegularPage(i) {
                 <img src = "${pages[i]}">
             </div>`
         }
-        
+
         else {
 
-            append= 
+            append=
             `<div class="pageL">
                 <img src = "${pages[i]}">
-            </div>    
+            </div>
             <div class="pageR" style = "position: relative;">
                 <img src ="https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/books/${book_title.replaceAll(' ', '_').toLowerCase()}/${i}.png" fetchpriority="high" style="position: relative;">
                 <div class = "textGradient" style="background: linear-gradient(to left, rgba(0,0,0,1), transparent);"></div>
@@ -280,6 +255,8 @@ function createRegularPage(i) {
         }
 
         main.children[i].innerHTML = append;
+
+        applyTextPage(main.children[i]);
 
         checkPageIfComplete(main.children[i], i);
     }
@@ -297,12 +274,12 @@ function checkPageIfComplete(page, i) {
     if(!boolComplete) {
 
         setTimeout(() => checkPageIfComplete(page, i), 1000);
-        
+
     }
     else {
 
         if(page.id == "divCoverPage") {
-            
+
             page.querySelectorAll('div').forEach((div) => {
                 div.style.visibility = "visible";
             })
@@ -316,12 +293,12 @@ function checkPageIfComplete(page, i) {
             i + 1 <= max_pages? i++ : i = i;
 
             createRegularPage(i);
-        }   
+        }
     }
 }
 
 function copyOrderID() {
-   
+
   let orderID = this.previousElementSibling?.textContent?.split(": ")[1].trim();
 
   navigator.clipboard.writeText(orderID);
@@ -330,19 +307,21 @@ function copyOrderID() {
 function resetOptPages () {
 
     let append = "";
+    let page_type = localData(book_title, kid_name).page_type.split(', ');
 
     for(let a = 0; a <= max_pages; a++) {
 
         let pagecount = `PAGE ${a}`;
         let starColor = arrFavs.includes(a) ? "#FFE100" : "#333333";
         let favClass = arrFavs.includes(a) ? " fav" : "";
+        let typeAttr = a >= 1 ? ` data-pagetype="${page_type[a-1]}"` : "";
 
         if(a == 0) {
             pagecount  = `COVER PAGE`;
         }
 
         append +=
-        `<div class="optPages${favClass}">
+        `<div class="optPages${favClass}"${typeAttr}>
             <div class="contStar">
                 <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M5.87145 0.492998C6.25809 -0.164341 7.2087 -0.164341 7.59535 0.492999L9.11293 3.07306C9.25376 3.31249 9.48783 3.48255 9.75906 3.5425L12.6818 4.18853C13.4265 4.35312 13.7202 5.2572 13.2145 5.82805L11.2297 8.06864C11.0455 8.27657 10.9561 8.55173 10.9829 8.82821L11.2717 11.8075C11.3452 12.5666 10.5762 13.1254 9.877 12.8208L7.13273 11.6255C6.87806 11.5146 6.58874 11.5146 6.33407 11.6255L3.58979 12.8208C2.89062 13.1254 2.12156 12.5666 2.19513 11.8075L2.4839 8.82821C2.5107 8.55173 2.4213 8.27657 2.23711 8.06864L0.252278 5.82805C-0.25341 5.2572 0.0403444 4.35312 0.784992 4.18853L3.70774 3.5425C3.97897 3.48255 4.21304 3.31249 4.35386 3.07306L5.87145 0.492998Z" fill="${starColor}"/>
@@ -354,6 +333,100 @@ function resetOptPages () {
     }
 
     document.querySelector('#dropdown').innerHTML = append;
+}
+
+function setCheckbox(opt) {
+
+    let chk = opt.querySelector('.chkSettings');
+
+    if(opt.dataset.toggle == "true") {
+        chk.style.background = "var(--theme-light-color)";
+        chk.innerHTML = `<h1 class="h1sharp" style="margin:auto">✔</h1>`;
+    }
+    else {
+        chk.style.background = "var(--bg)";
+        chk.innerHTML = ``;
+    }
+}
+
+function toggleHotkeys(opt) {
+
+    opt.dataset.toggle = opt.dataset.toggle == "true" ? "false" : "true";
+
+    setCheckbox(opt);
+
+    applyHotkeys();
+}
+
+function applyHotkeys() {
+
+    let show = document.querySelector('#chkHotkeys').closest('.optSettings').dataset.toggle == "true";
+    document.querySelectorAll('.hotkey').forEach(badge => badge.style.display = show ? "flex" : "none");
+}
+
+function toggleSettings() {
+
+    let divSettings = document.querySelector('#divSettings');
+    divSettings.dataset.toggle = divSettings.dataset.toggle == "true" ? "false" : "true";
+
+    let on = divSettings.dataset.toggle == "true";
+
+    divSettings.style.width = on ? "415px" : "";
+    divSettings.style.borderColor = on ? "var(--theme-med)" : "";
+    document.querySelector('#btnSettings svg').style.transform = on ? "rotate(180deg)" : "rotate(0deg)";
+
+}
+
+function initSettings() {
+    document.querySelectorAll('.optSettings').forEach(opt => setCheckbox(opt));
+    applyFillerPages();
+    applyTextPages();
+    applyHotkeys();
+}
+
+function toggleFillerPages(opt) {
+    opt.dataset.toggle = opt.dataset.toggle == "true" ? "false" : "true";
+    setCheckbox(opt);
+    applyFillerPages();
+}
+
+function applyFillerPages() {
+    let show = document.querySelector('#chkFillerPages').closest('.optSettings').dataset.toggle == "true";
+    let main = document.querySelector('main');
+    let dropdown = document.querySelector('#dropdown');
+
+    for(let a = 1; a <= max_pages; a++) {
+        let hide = !show && main.children[a].dataset.pagetype != 'A';
+
+        main.children[a].style.display = hide ? "none" : "";
+
+        if(dropdown.children[a]) dropdown.children[a].style.display = hide ? "none" : "";
+    }
+}
+
+function toggleTextPages(opt) {
+    opt.dataset.toggle = opt.dataset.toggle == "true" ? "false" : "true";
+    setCheckbox(opt);
+    applyTextPages();
+}
+
+function applyTextPages() {
+    let main = document.querySelector('main');
+
+    for(let a = 1; a <= max_pages; a++) {
+        applyTextPage(main.children[a]);
+    }
+}
+
+function applyTextPage(page) {
+
+    let show = document.querySelector('#chkTextPages').closest('.optSettings').dataset.toggle == "true";
+
+    let textHalf = page.dataset.textposition == "L" ? page.querySelector('.pageL') : page.querySelector('.pageR');
+
+    if(textHalf) textHalf.style.display = show ? "" : "none";
+
+    page.style.width = show ? "" : "700px";
 }
 
 function goToPage() {
@@ -411,7 +484,7 @@ function toggleZoom() {
         boolZoom = true;
         this.dataset.toggle = "true";
         this.style.background = "var(--theme-light)";
-        
+
     }
     else {
         boolZoom = false;
@@ -421,12 +494,12 @@ function toggleZoom() {
     }
 }
 
-let zoomFactor = 2;           
-let zoomSource = null;       
-let zoomClone  = null;       
-let lensRadius = 75;           
-let cursorX = 0, cursorY = 0;  
-let zoomFrame = 0;             
+let zoomFactor = 2;
+let zoomSource = null;
+let zoomClone  = null;
+let lensRadius = 75;
+let cursorX = 0, cursorY = 0;
+let zoomFrame = 0;
 
 function setZoomSource(img) {
 
@@ -454,8 +527,6 @@ function updateZoom() {
 
     let underCursor = document.elementFromPoint(cursorX, cursorY);
 
-    // these holders can stack layers (gradient/text) over their image, so always
-    // inspect the first image child rather than whatever sits on top under the cursor
     let imageHolder = underCursor?.closest('#coverFront, .pageL, .pageR');
     let zoomTarget = imageHolder ? imageHolder.querySelector('img') : underCursor;
 
@@ -489,7 +560,7 @@ function renderZoom() {
     if(!zoomSource || !zoomClone) return;
 
     let imgBox = zoomSource.getBoundingClientRect();
-    let spotX = cursorX - imgBox.left;      
+    let spotX = cursorX - imgBox.left;
     let spotY = cursorY - imgBox.top;
 
     document.querySelector('#divZoom').style.transform = `translate(${cursorX - lensRadius}px, ${cursorY - lensRadius}px)`;
@@ -511,25 +582,29 @@ function toggleAvatar() {
         this.dataset.toggle = "true";
         this.style.background = "var(--theme-light)";
         document.querySelector('#divAvatar').style.display = "flex";
+
+        if(boolZoom) queueZoom();
+
         setTimeout(() => {
             document.querySelector('#divAvatar').style.opacity = 100;
             document.querySelector('#contAvatar').style.opacity = 100;
             document.querySelector('#contAvatar').style.scale = "100%";
         }, 100)
-        
+
     }
     else {
 
         boolAvatar = false;
         this.dataset.toggle = "false";
         this.style.background = "transparent";
-    
+
         document.querySelector('#divAvatar').style.opacity = 0;
         document.querySelector('#contAvatar').style.opacity = 0;
         document.querySelector('#contAvatar').style.scale = "95%";
 
         setTimeout(() => {
             document.querySelector('#divAvatar').style.display = "none";
+            if(boolZoom) queueZoom();
         }, 100);
     }
 }
@@ -537,12 +612,11 @@ function toggleAvatar() {
 function toggleShade() {
 
     let page = document.querySelector(`.divRegularPage[data-page="${currPage}"]`);
-    if(!page) return;   // cover page has no text gradient to shade
+    if(!page) return;
 
-    // the text (and its gradient) lives in pageL when textposition is "L", otherwise pageR
     let textHalf = page.dataset.textposition == "L" ? page.querySelector('.pageL') : page.querySelector('.pageR');
     let textGradient = textHalf?.querySelector('.textGradient');
-    if(!textGradient) return;   // page has no text layer
+    if(!textGradient) return;
 
     if(page.dataset.shade == "true") {
         page.dataset.shade = "false";
@@ -559,14 +633,12 @@ async function downloadImage() {
     let imageSource;
 
     if(currPage == 0) {
-        // cover page: download the kid's image, which is the first child image of #coverFront
         imageSource = document.querySelector('#coverFront img');
     }
     else {
         let page = document.querySelector(`.divRegularPage[data-page="${currPage}"]`);
         if(!page) return;
 
-        // the image-only half is the opposite of the text half: "L" -> pageR, otherwise pageL
         let imageHalf = page.dataset.textposition == "L" ? page.querySelector('.pageR') : page.querySelector('.pageL');
         imageSource = imageHalf?.querySelector('img');
     }
@@ -575,7 +647,6 @@ async function downloadImage() {
 
     let fileName = `${book_id}_${currPage}.png`;
 
-    // fetch as a blob so the custom filename sticks (the download attribute is ignored for cross-origin urls)
     let response = await fetch(imageSource.src);
     let blob = await response.blob();
     let objectURL = URL.createObjectURL(blob);
@@ -593,7 +664,6 @@ function uploadImage() {
     let targetImage, minRatio, maxRatio, minWidth, minHeight;
 
     if(currPage == 0) {
-        // cover page: replace the kid's image (first child image of #coverFront)
         targetImage = document.querySelector('#coverFront img');
         minRatio = 1.19;
         maxRatio = 1.21;
@@ -604,7 +674,6 @@ function uploadImage() {
         let page = document.querySelector(`.divRegularPage[data-page="${currPage}"]`);
         if(!page) return;
 
-        // replace the image-only half (opposite of the text half): "L" -> pageR, otherwise pageL
         let imageHalf = page.dataset.textposition == "L" ? page.querySelector('.pageR') : page.querySelector('.pageL');
         targetImage = imageHalf?.querySelector('img');
         minRatio = 1.36;
@@ -615,7 +684,6 @@ function uploadImage() {
 
     if(!targetImage) return;
 
-    // open a dialog limited to a single png
     let fileInput = document.createElement('input');
     fileInput.type = "file";
     fileInput.accept = "image/png";
@@ -633,7 +701,6 @@ function uploadImage() {
         let objectURL = URL.createObjectURL(file);
         let probe = new Image();
 
-        // read the natural dimensions so we can validate aspect ratio + resolution before swapping it in
         probe.onload = () => {
 
             let aspectRatio = probe.width / probe.height;
@@ -659,12 +726,20 @@ function uploadImage() {
     fileInput.click();
 }
 
+function resetImage() {
+    let page = document.querySelector(`.divRegularPage[data-page="${currPage}"]`);
+    if(!page) return;
+
+    let imageHalf = page.dataset.textposition == "L" ? page.querySelector('.pageR') : page.querySelector('.pageL');
+    let img = imageHalf?.querySelector('img');
+    if(img) img.src = pages[currPage];
+}
+
 function hideDropdown() {
     document.querySelector('#dropPages').dataset.show = "false";
     document.querySelector('#dropdown').style.visibility = "hidden";
 }
 
-// close every popup (dropdown, context menu, notes) — only one may be open at a time
 function closePopups() {
     hideDropdown();
     hideContextMenu();
@@ -673,13 +748,12 @@ function closePopups() {
 
 function showContextMenu(x, y) {
 
-    hideDropdown();   // only one popup open at a time
+    hideDropdown();
     hideNotes();
 
     let contextMenu = document.querySelector('#contextMenu');
-    contextMenu.style.display = "block";   // make it measurable before clamping
+    contextMenu.style.display = "block";
 
-    // keep the menu inside the viewport
     let posX = Math.min(x, window.innerWidth - contextMenu.offsetWidth - 4);
     let posY = Math.min(y, window.innerHeight - contextMenu.offsetHeight - 4);
 
@@ -693,19 +767,17 @@ function hideContextMenu() {
 
 function addNotes() {
 
-    hideDropdown();        // only one popup open at a time
+    hideDropdown();
     hideContextMenu();
 
     let contextMenu = document.querySelector('#contextMenu');
     let divNotes = document.querySelector('#divNotes');
     let txtNotes = document.querySelector('#txtNotes');
 
-    // pull this page's note from the local cache — no supabase round-trip, no flicker
     txtNotes.value = arrNotes[currPage] || "";
 
-    divNotes.style.display = "block";   // make it measurable before clamping
+    divNotes.style.display = "block";
 
-    // open where the context menu was, clamped so the wider window still fits the viewport
     let x = parseFloat(contextMenu.style.left) || 0;
     let y = parseFloat(contextMenu.style.top) || 0;
 
@@ -725,7 +797,7 @@ function showAlert(message) {
 
 async function solveNote() {
 
-    arrNotes[currPage] = "";   // cache locally first, then clear the row in supabase
+    arrNotes[currPage] = "";
     hideNotes();
 
     let { error } = await msSupabase

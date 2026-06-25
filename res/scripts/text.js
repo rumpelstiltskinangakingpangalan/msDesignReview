@@ -4,6 +4,7 @@ let books = [];
 function localData(book_title, kid_name) {
 
   books[0] = {
+    
     title: "The Princess Within",
     type: "Regular",
     text_position: "L, R, L, L, R, R, R, L, L, R, R, L, L, R, R, R, R, L, L, L, R, R",

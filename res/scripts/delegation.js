@@ -4,18 +4,16 @@ document.addEventListener('click', async (e) => {
 
     let target = e.target;
 
-    // any click outside the custom context menu closes it
     if(!target.closest('#contextMenu')) {
         hideContextMenu();
     }
 
-    // clicking outside the notes window discards the draft and closes it
     if(!target.closest('#divNotes')) {
         hideNotes();
     }
 
     if(target.closest('#btnZoom') || target.id == 'btnZoom') {
-        toggleZoom.call(target.closest('#btnZoom'))    
+        toggleZoom.call(target.closest('#btnZoom'))
     }
 
     else if(target.closest('#btnAvatar') || target.id == 'btnAvatar') {
@@ -32,6 +30,10 @@ document.addEventListener('click', async (e) => {
 
     else if(target.closest('#btnUpload') || target.id == 'btnUpload') {
         uploadImage();
+    }
+
+    else if(target.closest('#btnReset') || target.id == 'btnReset') {
+        resetImage();
     }
 
     else if(target.closest('#btnDismiss') || target.id == 'btnDismiss') {
@@ -66,6 +68,18 @@ document.addEventListener('click', async (e) => {
         saveNote();
     }
 
+    else if(target.closest('.optSettings')) {
+        let opt = target.closest('.optSettings');
+        let id = opt.querySelector('.chkSettings').id;
+        if (id == 'chkFillerPages') toggleFillerPages(opt);
+        else if(id == 'chkTextPages') toggleTextPages(opt);
+        else if(id == 'chkHotkeys') toggleHotkeys(opt);
+    }
+
+    else if(target.closest('#btnSettings')) {
+        toggleSettings();
+    }
+
     if(target.closest('#btnCopy') || target.id == 'btnCopy') {
 
         copyOrderID.call(target.closest('#btnCopy'));
@@ -84,14 +98,14 @@ document.addEventListener('click', async (e) => {
     }
 
     else if(target.closest('#dropPages') || target.id == 'dropPages') {
-        
+
         if(target.closest('#dropPages').dataset.show == "false") {
             hideContextMenu();
             hideNotes();
             target.closest('#dropPages').dataset.show = "true";
             document.querySelector('#dropdown').style.visibility = "visible";
         }
-        
+
         else {
             target.closest('#dropPages').dataset.show = "false";
             document.querySelector('#dropdown').style.visibility = "hidden";
@@ -110,10 +124,9 @@ document.addEventListener('contextmenu', (e) => {
     let main = document.querySelector('main');
     let pageEl = e.target.closest('main > *');
 
-    // show the custom menu when right-clicking the focused page; otherwise just dismiss popups
     if(pageEl && pageEl === main.children[currPage]) {
         e.preventDefault();
-        showContextMenu(e.clientX, e.clientY);   // showContextMenu closes the dropdown + notes
+        showContextMenu(e.clientX, e.clientY);
     }
     else {
         closePopups();
@@ -125,10 +138,8 @@ document.addEventListener('mousewheel', (e) => {
     focusPage();
 })
 
-// scrolling the page dismisses any open popup and re-magnifies under the cursor
 window.addEventListener('scroll', (e) => {
 
-    // but don't close a popup when the scroll happens inside it (notes textarea / page list)
     if(e.target.closest && e.target.closest('#dropdown, #divNotes')) return;
 
         closePopups();
@@ -157,7 +168,7 @@ document.addEventListener('pointerover', (e) => {
             document.querySelector('#btnStar svg path').style.filter = "brightness(500%)";
             document.querySelector('#btnStar svg path').setAttribute("fill", "#333333");
         }
-        
+
     }
     else if(target.closest('.btnTools') && !target.closest('#btnApprove')) {
 
@@ -197,4 +208,34 @@ document.addEventListener('pointerout', (e) => {
         let btnTool = target.closest('.btnTools');
         btnTool.style.background = btnTool.dataset.toggle == "true" ? "var(--theme-light)" : "transparent";
     }
+})
+
+
+document.addEventListener('keydown', (e) => {
+
+    if(e.target.matches('input, textarea')) return;
+
+    if(e.ctrlKey && e.key == "Enter") {
+        document.querySelector('#btnApprove').click();
+        return;
+    }
+    else if(e.key == "Escape") {
+        hideNotes();
+        hideContextMenu();
+        hideDropdown();
+
+        btnAvatar.dataset.toggle == "true"? btnAvatar.click() : null;
+    }
+
+    let key = e.key.toUpperCase();
+    if(key == '`') key = '~';
+
+    document.querySelectorAll(`[class*='btn'], [id*='btn']`)
+    .forEach(btn => {
+
+        let label = btn.querySelector('.hotkey h1')?.textContent.trim().toUpperCase();
+
+        if(label == key) btn.click();
+
+    });
 })

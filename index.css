@@ -5,7 +5,7 @@
     --theme-dark: hsl(0 0% 11%);
     --theme-med: hsl(0 0% 15%);
     --theme-light: hsl(0 0% 20%);
-    --theme-shadow: hsl(0 0% 0% / .5); 
+    --theme-shadow: hsl(0 0% 0% / .25); 
     --theme-scroll-thumb: hsl(0 0% 30%);
     --theme-dark-color:  hsl(235 35% 15%);
     --theme-light-color: hsl(235 60% 70%);
@@ -289,6 +289,7 @@ nav {
     margin-bottom: auto;
     margin-left: var(--unit3); 
     margin-right: var(--unit4);
+    position: relative;
 }
 
 #btnCopy:hover svg {
@@ -357,6 +358,8 @@ main {
     background: var(--theme-dark);
     border-radius: var(--unit1);
     display: flex;
+    justify-content: center;
+
 }
 
 .divRegularPage svg {
@@ -364,7 +367,7 @@ main {
 }
 
 .pageL {
-    width: 50%;
+    width: 700px;
     height: 100%;
     display: flex;
 }
@@ -391,7 +394,7 @@ main {
 }
 
 .pageR {
-    width: 50%;
+    width: 700px;
     height: 100%;
     display: flex;
 }
@@ -423,28 +426,44 @@ footer {
 
 #divSettings {
     margin-left: var(--unit4);
-    width: auto;
-    padding-right: var(--unit3);
+    width: 40px;
+    min-width: 40px;
+    border: 1px solid transparent;
+    overflow: hidden;
+    transition: 0.2s;
 }
 
 #btnSettings {
-    width: calc(var(--unit1) * 10);
-    height: 100%;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
     background: var(--bg);
     display: flex;
     border-top-left-radius: 999px;
     border-bottom-left-radius: 999px;
     cursor: pointer;
+    position: relative;
+}
+
+#btnSettings:hover {
+    background: var(--theme-light);
 }
 
 #btnSettings svg {
     margin: auto;
+    transition: transform 0.3s;
 }
 
 #dropPages {
+    min-width: 250px;
     width: 250px;
     cursor: pointer;
     position: relative;
+    justify-self: center;
+}
+
+#dropPages h1 {
+    cursor: pointer;
 }
 
 #dropdown {
@@ -559,13 +578,33 @@ footer {
     height: calc(var(--unit1) * 10);
     background: transparent;
     display: flex;
+    position: relative;
 }
+
 
 .btnTools:hover {
     background: var(--theme-light);
 }
 
 .btnTools svg {
+    margin: auto;
+}
+
+.hotkey {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    background: var(--bg);
+    left: 10%;
+    top: -85%;
+    display: none;
+    padding: 6px;
+    border-radius: var(--unit2);
+    border: 1px solid var(--theme-light);
+    cursor: pointer;
+}
+
+.hotkey h1 {
     margin: auto;
 }
 
@@ -622,11 +661,12 @@ footer {
     border-radius: var(--unit1);
     margin: auto;
     margin-right: var(--unit2);
+    display: flex;
 }
 
 #divZoom {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     position: fixed;
     top: 0;
     left: 0;
@@ -656,7 +696,7 @@ footer {
     top: 40px;
     display: none;
     opacity: 0;
-    transition: .2s;
+    transition-delay: .1s;
     z-index: 2;
 }
 
@@ -758,6 +798,7 @@ footer {
     height: 40%;
     aspect-ratio: 1;
 }
+
 
 
 
