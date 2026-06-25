@@ -178,12 +178,11 @@ nav {
 }
 
 .optContext:hover {
-    background: var(--theme-light);
+    background: var(--theme-med-color);
 }
 
 .optContext:hover h1 {
     color: var(--text-sharp);
-    
 }
 
 .iconContext {
@@ -259,11 +258,15 @@ nav {
 }
 
 .btnNotes:hover {
-    background: var(--theme-light);
+    background: var(--theme-med-color);
 }
 
 .btnNotes:hover h1 {
     color: var(--text-sharp);
+}
+
+#btnSave:hover svg path {
+    fill: var(--text-sharp);
 }
 
 .iconNote {
@@ -318,7 +321,7 @@ main {
 #divCoverPage {
     
     width: 1500px;
-    height: auto;
+    min-height: 624px;
     margin: auto;
     display: flex;
 }
@@ -349,11 +352,15 @@ main {
 .divRegularPage {
 
     width: 1400px;
-    height: 544.45px;
+    min-height: 544.45px;
     margin: auto;
     background: var(--theme-dark);
     border-radius: var(--unit1);
     display: flex;
+}
+
+.divRegularPage svg {
+    margin: auto;
 }
 
 .pageL {
@@ -374,6 +381,7 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    visibility: hidden;
 }
 
 .textGradient {
@@ -464,7 +472,7 @@ footer {
 }
 
 .optPages:hover {
-    background: var(--theme-light);
+    background: var(--theme-med-color);
 }
 
 .optPages svg {
@@ -480,6 +488,7 @@ footer {
 
 .optPages h1 {
     margin: auto;
+    cursor: pointer;
 }
 
 .optPages:hover h1 {
@@ -601,6 +610,10 @@ footer {
     cursor: pointer;
 }
 
+.optSettings h1 {
+    cursor: pointer;
+}
+
 .chkSettings {
     width: var(--unit3);
     height: var(--unit3);
@@ -611,10 +624,9 @@ footer {
     margin-right: var(--unit2);
 }
 
-
 #divZoom {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     position: fixed;
     top: 0;
     left: 0;
@@ -644,7 +656,7 @@ footer {
     top: 40px;
     display: none;
     opacity: 0;
-    transition: .1s;
+    transition: .2s;
     z-index: 2;
 }
 
@@ -655,7 +667,8 @@ footer {
     gap: 2em;
     opacity: 0;
     transition-duration: .1s;
-    scale: 105%;
+    transition-delay: .2s;
+    scale: 95%;
 }
 
 .divAvatarHori {

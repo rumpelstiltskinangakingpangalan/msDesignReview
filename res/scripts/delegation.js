@@ -131,11 +131,14 @@ window.addEventListener('scroll', (e) => {
     // but don't close a popup when the scroll happens inside it (notes textarea / page list)
     if(e.target.closest && e.target.closest('#dropdown, #divNotes')) return;
 
-    closePopups();
+        closePopups();
 
     if(boolZoom) {
+
         queueZoom();
+
     }
+
 }, true)
 
 document.addEventListener('pointerover', (e) => {
@@ -171,7 +174,6 @@ document.addEventListener('pointermove', (e) => {
         queueZoom();
     }
 })
-
 
 document.addEventListener('pointerout', (e) => {
 

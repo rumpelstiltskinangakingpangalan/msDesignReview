@@ -8,11 +8,11 @@ let book_id = "1e461b89-f9f3-45a4-b36f-479ed823336d";
 
 let pages = [];
 let arrNotes = [];
+let loadCursor = 0;   // page the sequential loader is currently completing (0 = cover first)
+let loadTimer; 
 let boolZoom, boolAvatar = false;
 let order_id, book_title, max_pages, kid_name, kid_age, kid_gender, kid_img_half, kid_img_full, 
 companion_name, companion_img_half, companion_img_full, arrFavs, currPage;
-
-let bucketURL = `https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/sample_images/${book_id}/0.png`;
 
 /*
 async function addPages() {
@@ -154,11 +154,12 @@ function initUI() {
         document.head.insertAdjacentHTML('beforeend', book.fonts);
     }
 
-    createCoverPage();
+    document.fonts.ready.then(() => createCoverPage());
 }
 
 function createCoverPage() {
 
+    let append = "";
     let main = document.querySelector('main');
     let book = localData(book_title, kid_name);
     
@@ -166,7 +167,7 @@ function createCoverPage() {
     let page_type = book.page_type.split(', ');
     let text_position = book.text_position.split(', ');
     
-    let append = 
+    main.firstElementChild.innerHTML = 
     `<div id="coverBack">
         ${book.pages['coverBack']}
     </div>
@@ -174,22 +175,20 @@ function createCoverPage() {
         ${book.pages['coverFront']}
     </div>`        
 
-    main.firstElementChild.insertAdjacentHTML('beforeend', append);
-
-    append = "";
-
     for(let a = 1; a <= max_pages; a++) {
-        append += `<div class="divRegularPage" data-page="${a}" data-textposition="${text_position[a-1]}" data-pagetype="${page_type[a-1]}" data-shade="true"></div>`
+        append +=
+        `<div class="divRegularPage" data-page="${a}" data-textposition="${text_position[a-1]}" data-pagetype="${page_type[a-1]}" data-shade="true"></div>`
     }
 
     main.insertAdjacentHTML('beforeend', append);
+
+    checkPageIfComplete(main.firstElementChild, 0)
 
     focusPage();
 }
 
 function focusPage() {
 
-    let i;
     let main = document.querySelector('main');
     let book = localData(book_title, kid_name);
     let page_reference = book.references;
@@ -201,7 +200,7 @@ function focusPage() {
 
     for(let a = 0; a <= max_pages; a++) {
 
-        if(main.children[a] != null || main.children[a] != undefined) {
+        if(main.children[a] != null || main.children[a] != undefined && a != currPage) {
 
             let focusPage = main.children[a];
             let focusPageT = focusPage.getBoundingClientRect().top;
@@ -235,16 +234,7 @@ function focusPage() {
                 }
     
                 currPage = a;
-                //createpage downward
-                a + 1 <= max_pages? i = a + 1: i = a;
 
-                createRegularPage(i);
-
-                //createpage upward
-                a - 1 > 0? i = a - 1: i = a;
-                createRegularPage(i);
-
-                break;
             }
         }
     }
@@ -252,7 +242,7 @@ function focusPage() {
 }
 
 function createRegularPage(i) {
-    
+
     let append = "";
     let main = document.querySelector('main');
     let book = localData(book_title, kid_name);
@@ -260,7 +250,8 @@ function createRegularPage(i) {
     let page_type = book.page_type.split(', ');
     let page_text = book.pages;
 
-    if(main.children[i].innerHTML == "") {
+
+    if(i >= 1 && i <= max_pages && main.children[i].childElementCount == 0) {
 
         if(text_position[i-1] == "L") {
 
@@ -288,8 +279,44 @@ function createRegularPage(i) {
             </div>`
         }
 
-        main.children[i].insertAdjacentHTML('beforeend', append);
+        main.children[i].innerHTML = append;
 
+        checkPageIfComplete(main.children[i], i);
+    }
+
+    else {
+        return;
+    }
+}
+
+function checkPageIfComplete(page, i) {
+
+    let boolComplete = [...page.querySelectorAll('img')]
+    .every(img => img.complete);
+
+    if(!boolComplete) {
+
+        setTimeout(() => checkPageIfComplete(page, i), 1000);
+        
+    }
+    else {
+
+        if(page.id == "divCoverPage") {
+            
+            page.querySelectorAll('div').forEach((div) => {
+                div.style.visibility = "visible";
+            })
+
+            createRegularPage(1);
+        }
+        else {
+
+            page.querySelector('.textWrapper').style.visibility = 'visible';
+
+            i + 1 <= max_pages? i++ : i = i;
+
+            createRegularPage(i);
+        }   
     }
 }
 
@@ -332,7 +359,7 @@ function resetOptPages () {
 function goToPage() {
 
     let main = document.querySelector('main');
-    let i = this.querySelector('p').textContent;
+    let i = this.querySelector('h1').textContent;
 
     if(i == 'COVER PAGE') {
         i = 0;
@@ -341,13 +368,14 @@ function goToPage() {
         i = Number(i.replace("PAGE ", ''));
     }
 
-    let offset = 100;
+    let offset = 128;
 
     main.scrollTo({
         top: main.children[i].offsetTop - offset,
         behavior: "instant"
     });
 
+    createRegularPage(i);
     focusPage();
 
 }
@@ -487,24 +515,22 @@ function toggleAvatar() {
             document.querySelector('#divAvatar').style.opacity = 100;
             document.querySelector('#contAvatar').style.opacity = 100;
             document.querySelector('#contAvatar').style.scale = "100%";
-        }, 50)
+        }, 100)
         
     }
     else {
+
         boolAvatar = false;
         this.dataset.toggle = "false";
         this.style.background = "transparent";
     
         document.querySelector('#divAvatar').style.opacity = 0;
         document.querySelector('#contAvatar').style.opacity = 0;
-        document.querySelector('#contAvatar').style.scale = "105%";
+        document.querySelector('#contAvatar').style.scale = "95%";
 
         setTimeout(() => {
             document.querySelector('#divAvatar').style.display = "none";
         }, 100);
-
-        
-
     }
 }
 
@@ -691,7 +717,6 @@ function hideNotes() {
     document.querySelector('#divNotes').style.display = "none";
 }
 
-// show the pink banner with a message (the warning triangle is part of the message string)
 function showAlert(message) {
     let alertBanner = document.querySelector('#alertBanner');
     alertBanner.querySelector('h1').textContent = message;
@@ -718,10 +743,9 @@ async function saveNote() {
 
     let notes = document.querySelector('#txtNotes').value;
 
-    arrNotes[currPage] = notes;   // cache locally first, then persist to supabase
+    arrNotes[currPage] = notes;
     hideNotes();
 
-    // does a row already exist for this book + page?
     let { data } = await msSupabase
     .from("table_notes")
     .select("page")
@@ -750,9 +774,6 @@ async function saveNote() {
     }
 }
 
-function viewInImageReview() {
-    // TODO: open the current page in Image Review (currPage)
-}
 
 
 

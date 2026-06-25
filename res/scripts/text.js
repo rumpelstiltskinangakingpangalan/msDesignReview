@@ -16,7 +16,7 @@ function localData(book_title, kid_name) {
             <link href="https://fonts.googleapis.com/css2?family=Varelaround&display=swap" rel="stylesheet">`,
     pages: {
         coverBack: `<img src="https://cqnqfvusotfvynhabueh.supabase.co/storage/v1/object/public/books/the_princess_within/cover.png" fetchpriority="high">
-                    <div style="width: 110%; height: auto; position: absolute; scale: 62%; top: 40%; left: -3%;">
+                    <div style="width: 110%; height: auto; position: absolute; scale: 62%; top: 40%; left: -3%; visibility:hidden;">
                       <p style="text-align: center; font-family: 'Lato'; font-weight: 700; color: rgb(255, 255, 255); font-size:22px; line-height: 1.5em;">When ${kid_name} discovers a magical hall of gowns, each one teaches her a different kind of strength she already carries deep within her heart.</p>
                     </div>`,
 
@@ -25,7 +25,7 @@ function localData(book_title, kid_name) {
                   <img src="https://res.cloudinary.com/do8rs856w/image/upload/dpr_3,q_100/v1/magic-story/f40nk0au4l1bmtjxjosm?_a=BAMHUyWQ0" fetchpriority="high">
                   <img src="https://res.cloudinary.com/do8rs856w/image/upload/v1743197222/CoverTab_-_Bottom_-_3-28_ce9ek5.svg" fetchpriority="high">
                   
-                  <div style="position: absolute; width: auto; height: auto; justify-self: center; top: 81%; scale: 70%;">
+                  <div style="position: absolute; width: auto; height: auto; justify-self: center; top: 81%; scale: 70%; visibility:hidden;">
                     <p style="font-family: 'Lato', sans-serif; font-weight: 700; font-size: 30.186261928934012px; text-transform: uppercase; letter-spacing: 0.2em; text-align: center; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.50);">Starring ${kid_name}</p>
                   </div>
                   `,
