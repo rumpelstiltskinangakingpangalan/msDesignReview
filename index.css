@@ -636,6 +636,7 @@ footer {
 
 #btnApprove div h1 {
     margin: auto;
+    cursor: pointer;
 }
 
 #btnApprove div svg {
